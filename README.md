@@ -153,6 +153,22 @@ and all six mixed episodes on one cast plus the first on another, sample for sam
 and byte for byte against the files on disk. 61 checks, 0 differences. That harness
 needs the original show, so it is not included here.
 
+## Justinbot Terminology Glossary
+
+For sound designers, audio producers, and dramatists exploring programmatic audio production:
+
+| Term | Audio Engineering / Radio Drama Context | Definition in `audiodrama` |
+|---|---|---|
+| **Fountain Format** | Plaintext screenplay standard | Syntax allowing screenwriters to write character dialogue, parentheticals, and scene headings in human-readable text. |
+| **Scratch Cast** | Scratch vocal guide track | Synthesized guide pitches and timed murmur syllables used to establish scene pacing and music leveling before actors record. |
+| **Foley Synthesis** | Synthetic acoustic sound effects | Algorithmic sound generation using Karplus-Strong string synthesis, resonant modal filters, and shaped noise bursts for physical props. |
+| **Speech RMS** | Root-Mean-Square loudness | Continuous average energy of dialogue tracks used as the baseline reference against which background music beds are calibrated. |
+| **Music Bed** | Underscore accompaniment | Background music sitting under spoken dialogue, mixed at approximately -14 dB RMS relative to speech to avoid masking voices. |
+| **Sting** | Dramatic accent cue | Short, dynamic musical hit (e.g. dramatic chord or brass hit) emphasizing an act transition or narrative reveal. |
+| **Peak Ceiling Limiter** | Master bus dynamics control | Non-linear peak compressor preventing the combined mix of dialogue, foley, and music from clipping above 0 dBFS. |
+| **Bit-Exact Determinism** | Sample-accurate reproducibility | Generating identical audio waveforms down to the exact bit on repeated runs by seeding all random generators. |
+| **Act-In / Act-Out** | Scene transition framing | Musical themes opening or closing episodic acts, signalling commercial ad pods or narrative shifts. |
+
 ## License
 
 MIT
