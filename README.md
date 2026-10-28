@@ -61,6 +61,15 @@ python -m examples.demo.run levels      # how loud each music placement lands
 python -m examples.demo.run mp3         # needs .[mp3]
 ```
 
+The same stages, and the player that writes `mixconfig.json`, are on one page:
+
+```
+python -m examples.demo.desk --root out/demo
+```
+
+Every control runs a stage or saves a setting, and the caption is the outcome.
+The control × outcome matrix is `docs/control-outcome-matrix.md`.
+
 Everything is written under `--root` (default `out/demo`). The source parts are only
 ever read.
 
