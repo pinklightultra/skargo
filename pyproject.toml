@@ -21,6 +21,7 @@ dependencies = ["numpy>=1.24"]
 [project.optional-dependencies]
 edge = ["edge-tts", "miniaudio"]
 mp3 = ["lameenc"]
+ui = ["playwright>=1.40"]
 all = ["edge-tts", "miniaudio", "lameenc"]
 
 [tool.setuptools.packages.find]
