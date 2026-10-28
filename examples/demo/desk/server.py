@@ -18,8 +18,8 @@ _FONTS = {
     "/fonts/graphic-novel-sans-400.woff2",
     "/fonts/graphic-novel-sans-600.woff2",
     "/fonts/graphic-novel-sans-700.woff2",
-    "/fonts/literata-400.woff2",
-    "/fonts/literata-600.woff2",
+    "/fonts/source-sans-400.woff2",
+    "/fonts/source-sans-600.woff2",
     "/fonts/muthr.woff2",
 }
 

@@ -1,12 +1,14 @@
 GraphicNovelSans
   Bricolage Grotesque, latin subset, SIL Open Font License 1.1.
   Copyright 2022 The Bricolage Grotesque Project Authors.
+  Used for the masthead only.
   https://github.com/atelier-anchor/bricolage-grotesque
 
-Literata
+Source Sans 3
   Latin subset, SIL Open Font License 1.1.
-  Copyright 2017 The Literata Project Authors.
-  https://github.com/googlefonts/literata
+  Copyright 2010-2020 Adobe (with Reserved Font Name Source).
+  The UI face for labels, buttons, and body text.
+  https://github.com/adobe-fonts/source-sans
 
 MuTHR
   Share Tech Mono, latin subset, SIL Open Font License 1.1.
