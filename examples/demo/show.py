@@ -124,9 +124,10 @@ def canon(prose, scenes, check):
     check("the keeper is unnamed until the door opens", 0 <= door < iris,
           "first 'iris' at %.0f%%, door at %.0f%%" % (100 * iris / len(low), 100 * door / len(low)))
     sister = [m.start() for m in re.finditer(r"\bsister\b", low)]
-    check("the sister is revealed once, late", len(sister) == 1 and sister[0] / len(low) > 0.6,
-          "%d mentions%s" % (len(sister), ", at %.0f%%" % (100 * sister[0] / len(low))
-                             if sister else ""))
+    n = len(sister)
+    where = (", at %.0f%%" % (100 * sister[0] / len(low))) if sister else ""
+    check("the sister is revealed once, late", n == 1 and sister[0] / len(low) > 0.6,
+          "%d mention%s%s" % (n, "" if n == 1 else "s", where))
 
 
 def checker(root, source_lines=None):

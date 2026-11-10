@@ -565,7 +565,9 @@ class DraftCheck:
                     R.fail("RECAPS", f"EP{ep_n} attributes to {speaker}, who does not "
                                      f"speak in EP{ep_n - 1}")
         if not bad:
-            R.ok("RECAPS", f"{quoted} quoted clips across {len(self.recaps)} recaps, "
+            n = len(self.recaps)
+            noun = "recap" if n == 1 else "recaps"
+            R.ok("RECAPS", f"{quoted} quoted clips across {n} {noun}, "
                            f"all verbatim and correctly attributed")
 
     def t_foley(self, scenes, R):

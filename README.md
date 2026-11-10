@@ -1,7 +1,6 @@
-# audiodrama
+# skargo
 
-Turn a Fountain screenplay into a scored, mixed, quality-checked audio drama, with
-nothing past numpy.
+skargo (`import audiodrama`) turns a Fountain screenplay into mixed episode WAVs for someone who wants the cut, the cues, and a scratch mix before a cast records.
 
 The pipeline was built to produce a six-episode radio serial, then split into
 libraries with everything specific to that show moved into a config folder.
@@ -9,27 +8,158 @@ libraries with everything specific to that show moved into a config folder.
 episodes about a letter that washes up at an island post office. The pipeline runs
 it from script to finished WAVs offline, on any OS, in under half a minute.
 
+## Quickstart
+
+From the repo root, on Python 3.10 or newer:
+
 ```
-pip install -e .                      # numpy is the only dependency
-python -m examples.demo.run all       # -> out/demo/audio/episodes/LOW_TIDE_EP*.wav
+pip install -e .
+python -m examples.demo.run all
+```
+
+`pip install -e .` installs the `audiodrama` package. Numpy is the only dependency.
+The demo runner is not an installed script: Python finds `examples/` because the
+current directory is the repo root.
+
+`all` writes the scratch-cast episodes here:
+
+```
+out/demo/audio/episodes/LOW_TIDE_EP1_scratch.wav
+out/demo/audio/episodes/LOW_TIDE_EP2_scratch.wav
 ```
 
 Without installing, set `PYTHONPATH` to `src` plus the repo root (`src;.` on Windows,
-`src:.` elsewhere).
+`src:.` elsewhere) and run the same command from the repo root.
 
-The demo speaks with the **scratch cast**: placeholder murmurs as long as each line
-takes to say, at each part's own pitch, levelled to the speech reference the music is
-measured against. The pacing, ad pods, music levels and QA all run before any real
-voice exists. For real voices:
+The demo speaks with the **scratch cast**: placeholder murmurs about as long as each
+line takes to say, at each part's own pitch, levelled to the speech reference the
+music is measured against. The pacing, ad pods, music levels and draft check all run
+before any real voice exists. For real voices:
 
 ```
-pip install -e .[edge]                                  # Edge neural voices
+pip install -e '.[edge]'
 python -m examples.demo.run voices --cast edge
-python -m examples.demo.run timeline --voices edge      # stamp the real durations
+python -m examples.demo.run timeline --voices edge
 python -m examples.demo.run mix --voices edge
 ```
 
-Windows can use `--cast sapi` instead, which needs no extras.
+Edge fetches each line from the read-aloud endpoint, so that cast needs a network,
+and the endpoint can change. Fine for a draft. Windows can use `--cast sapi`
+instead, which needs no extras.
+
+## Example
+
+This is stdout from `python -m examples.demo.run all` on the scratch cast, default
+root. Both WAVs are mono 16-bit at 22050 Hz, 4.4 minutes each.
+
+```
+== init
+copied 2 parts
+
+== script
+stamped 6 markers across 7 scenes
+stamped 37 foley cues (7 room tones) across 2 parts
+wrote 2 episodes -> episodes/
+  EP1 The Causeway             3 acts  2 ads  story 3:33  slot 8:33   23 foley
+  EP2 High Water               3 acts  2 ads  story 3:18  slot 8:18   14 foley
+  TOTAL                       6:51 story, 16:51 slot, 41 cues
+
+== check
+=== LOW TIDE check :: 7 scenes ===
+
+[ ok ] REPETITION: 65/65 substantive lines unique (1.0000); 0 motifs over budget
+[ ok ] NGRAM: no 7-gram repeats 3+ times across 951 tokens
+[ ok ] SHAPE: scene words 82-183, mean 136, CV 0.28
+[ ok ] POSITIONAL: no slot shared by 30%+ of scenes
+[ ok ] SLUG: 7 slugs valid, 3 distinct time tokens
+[ ok ] DAY: days 1..2 monotonic across 7 scenes
+[ ok ] CLOCK: 0 timestamped scenes run forward within all 0 days
+[ ok ] CAST: 5 speakers, 52 cues; top [('MAEVE', 17), ('TOBY', 15), ('IRIS', 13), ('OWEN', 5)]
+[ ok ] CANON: the keeper is unnamed until the door opens -- first 'iris' at 51%, door at 49%
+[ ok ] CANON: the sister is revealed once, late -- 1 mention, at 78%
+[ ok ] PLANT: the stamps: 6 mentions, 18% -> 96%
+[ ok ] PLANT: the biscuit tins: 5 mentions, 36% -> 82%
+[ ok ] STYLE: no em dashes
+[ ok ] EPISODES: 2 episodes, 6 acts, 4 ad breaks, 3-3 min
+[ ok ] EPISODES: no episode is orphaned mid-day -- spread 1.08x
+[ ok ] EPISODES: episodes fit one slot (longest < 1.4x shortest) -- spread 1.08x
+[ ok ] RECAPS: 3 quoted clips across 1 recap, all verbatim and correctly attributed
+[ ok ] FOLEY: every scene has a room tone -- 0 exceptions
+[ ok ] FOLEY: the room tone is the first cue -- 0 exceptions
+[ ok ] FOLEY: 37 cues, 23 distinct sounds to build
+[ ok ] FOLEY: 0 scenes carry room tone only
+[ ok ] CUT: 2 episode files, 4 ad breaks, 0 landing anywhere but an act break
+[ ok ] CUT: cues.json written for the audio pass
+[ ok ] LENGTH: 1058 words, 7 scenes, est. 7 pages
+
+
+0 failures, 0 warnings
+
+== timeline
+timeline: action 27, actout 8, ad 4, card 9, foley 37, recap 1, screen 1, slug 7, speech 55
+wrote audio/timeline.json, 100 utterances
+
+== voices
+scratch cast: 100 lines rendered, 0 kept -> lines_scratch
+
+== timeline
+timeline: action 27, actout 8, ad 4, card 9, foley 37, recap 1, screen 1, slug 7, speech 55
+wrote audio/timeline.json, 100 utterances
+
+== sfx
+synthesised 23 sounds -> audio/sfx/ (6 room tones, 17 events)
+
+== backlog
+wrote 2 backlog tracks -> backlog/
+
+== music
+wrote music.json with the default picks; edit and re-run
+  titles        low_tide_theme.wav        10.0s  -3 dB vs speech  rms 0.0499  peak 0.24
+  actin         low_tide_theme.wav         3.0s  -4 dB vs speech  rms 0.0445  peak 0.29
+  actout        low_tide_theme.wav         4.5s  -2 dB vs speech  rms 0.0560  peak 0.42
+  recap         harbour_bed.wav           30.0s  -14 dB vs speech  rms 0.0141  peak 0.04
+4 slots in actin/actout/recap/titles, from 2 of the backlog's tracks
+
+== mix
+  EP1   4.4 min   19 sfx  2 ad pods  6 music  LOW_TIDE_EP1_scratch.wav
+  EP2   4.4 min   11 sfx  2 ad pods  7 music  LOW_TIDE_EP2_scratch.wav
+wrote 8.7 min of audio -> audio/episodes/
+
+== levels
+EP1  4.4 min  music-only energy in 28.8s of it
+6 runs
+  at          secs     music      prog    delta
+   0:39.14   10.0    0.0500    0.0189    +8.4 dB
+   0:49.79    4.5    0.0562    0.0000   +99.0 dB
+   0:57.87    3.0    0.0442    0.0602    -2.7 dB
+   3:05.30    4.5    0.0562    0.0019   +29.5 dB
+   3:13.38    3.0    0.0442    0.0575    -2.3 dB
+   4:16.77    4.5    0.0562    0.0020   +28.8 dB
+
+full-mix peak with music 0.548 (ceiling 0.89)
+EP2  4.4 min  music-only energy in 50.1s of it
+7 runs
+  at          secs     music      prog    delta
+   0:00.01   21.4    0.0140    0.0662   -13.5 dB
+   1:04.83   10.0    0.0500    0.0189    +8.4 dB
+   1:15.48    4.5    0.0562    0.0000   +99.0 dB
+   1:23.55    3.0    0.0442    0.0592    -2.5 dB
+   2:46.90    4.5    0.0562    0.0027   +26.2 dB
+   2:54.97    3.0    0.0442    0.0586    -2.4 dB
+   4:18.17    4.5    0.0562    0.0019   +29.6 dB
+
+full-mix peak with music 0.533 (ceiling 0.89)
+```
+
+The `slot` column prices each ad break at 150 seconds. The mix uses the 6-second
+audition pod, which is why a 3:33 story comes back as a 4.4 minute WAV.
+
+The script pass counts a room cue on each of the 7 scenes. The synth writes 6 room
+files because the post office tone is used in both episodes, plus 17 event sounds.
+
+A delta of +99.0 dB is a placement whose programme RMS rounds to 0.0000, so the
+ratio is the music over near-silence. The recap on episode 2 sits under speech and
+measures -13.5 dB; that slot is set at -14.
 
 ## The six libraries
 
@@ -38,9 +168,9 @@ Windows can use `--cast sapi` instead, which needs no extras.
 | `audiodrama.script` | Fountain parsing; `[[ep:]]` / `[[act:]]` scene markers; foley cue stamping (`FoleyRules`); cutting a feature draft into episodes with recaps, loglines, EPISODES.md and CUES.md (`write_cut`) |
 | `audiodrama.voice` | turning screenplay lines into speakable text; the audio timeline (`TimelineParser`, `assign_wavs`); four casts: scratch (no engine), SAPI (Windows), Edge neural voices, and Synthesia avatar video with captions aligned back to lines |
 | `audiodrama.sound` | WAV I/O for any PCM or float WAV; a seeded foley synth (`Synth`: modal, Karplus-Strong, band noise, room tones, footsteps, a hummed melody); `build` turns a dict of recipes into files |
-| `audiodrama.score` | **music scoring.** Cuts slots (titles, act-ins, act-outs, recap beds, one bed per scene genre) from a folder of songs, levelled as RMS against measured speech; `analyze` holds the measurements the picks are made on |
+| `audiodrama.score` | music scoring. Cuts slots (titles, act-ins, act-outs, recap beds, one bed per scene genre) from a folder of songs, levelled as RMS against measured speech; `analyze` holds the measurements the picks are made on |
 | `audiodrama.mix` | the numpy mixer (lines, foley beds, music, ad pods, recaps, and a peak ceiling on the master); `music_levels` measures every music placement against the programme under it; scene A/B renders; mp3 export |
-| `audiodrama.qa` | **draft scoring.** `DraftCheck` scores a draft on repetition, n-gram reuse, scene shape, template smell, slugs, time of day, set-ups and pay-offs, the episode cut, recaps and foley coverage. The show's own canon rules plug in as a function |
+| `audiodrama.qa` | draft scoring. `DraftCheck` scores a draft on repetition, n-gram reuse, scene shape, template smell, slugs, time of day, set-ups and pay-offs, the episode cut, recaps and foley coverage. The show's own canon rules plug in as a function |
 
 Nothing under `src/` knows the name of any show.
 
@@ -58,17 +188,18 @@ python -m examples.demo.run backlog     # synthesise the demo's two-track song b
 python -m examples.demo.run music       # cut music slots from the backlog
 python -m examples.demo.run mix         # [--voices scratch|sapi|edge] [EP ...]
 python -m examples.demo.run levels      # how loud each music placement lands
-python -m examples.demo.run mp3         # needs .[mp3]
+python -m examples.demo.run mp3         # needs the mp3 extra: pip install -e '.[mp3]'
 ```
 
-The same stages, and the player that writes `mixconfig.json`, are on one page:
+The same stages, and the player that writes `mixconfig.json`, are on one page.
+The desk binds to 127.0.0.1, port 8765 unless you pass `--port`, and prints the URL:
 
 ```
 python -m examples.demo.desk --root out/demo
 ```
 
 Every control runs a stage or saves a setting, and the caption is the outcome.
-The control × outcome matrix is `docs/control-outcome-matrix.md`.
+The control × outcome matrix is [docs/control-outcome-matrix.md](docs/control-outcome-matrix.md).
 
 Everything is written under `--root` (default `out/demo`). The source parts are only
 ever read.
@@ -162,22 +293,6 @@ and all six mixed episodes on one cast plus the first on another, sample for sam
 and byte for byte against the files on disk. 61 checks, 0 differences. That harness
 needs the original show, so it is not included here.
 
-## Justinbot Terminology Glossary
-
-For sound designers, audio producers, and dramatists exploring programmatic audio production:
-
-| Term | Audio Engineering / Radio Drama Context | Definition in `audiodrama` |
-|---|---|---|
-| **Fountain Format** | Plaintext screenplay standard | Syntax allowing screenwriters to write character dialogue, parentheticals, and scene headings in human-readable text. |
-| **Scratch Cast** | Scratch vocal guide track | Synthesized guide pitches and timed murmur syllables used to establish scene pacing and music leveling before actors record. |
-| **Foley Synthesis** | Synthetic acoustic sound effects | Algorithmic sound generation using Karplus-Strong string synthesis, resonant modal filters, and shaped noise bursts for physical props. |
-| **Speech RMS** | Root-Mean-Square loudness | Continuous average energy of dialogue tracks used as the baseline reference against which background music beds are calibrated. |
-| **Music Bed** | Underscore accompaniment | Background music sitting under spoken dialogue, mixed at approximately -14 dB RMS relative to speech to avoid masking voices. |
-| **Sting** | Dramatic accent cue | Short, dynamic musical hit (e.g. dramatic chord or brass hit) emphasizing an act transition or narrative reveal. |
-| **Peak Ceiling Limiter** | Master bus dynamics control | Non-linear peak compressor preventing the combined mix of dialogue, foley, and music from clipping above 0 dBFS. |
-| **Bit-Exact Determinism** | Sample-accurate reproducibility | Generating identical audio waveforms down to the exact bit on repeated runs by seeding all random generators. |
-| **Act-In / Act-Out** | Scene transition framing | Musical themes opening or closing episodic acts, signalling commercial ad pods or narrative shifts. |
-
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
